@@ -7,7 +7,7 @@ class VistaLenguaje(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Práctica 2 - Operaciones entre lenguajes")
-        self.setGeometry(100, 100, 500, 300)
+        self.setGeometry(100, 100, 500, 600)
 
         self.setStyleSheet("QPushButton { background-color: #6495ED; color: white; border-radius: 5px; min-height: 30px; }")
         self.layout = QVBoxLayout()
@@ -18,54 +18,42 @@ class VistaLenguaje(QWidget):
         self.layout.addWidget(self.label)
 
         self.resultadoListaWidget = QListWidget()
-
         self.resultadoListaWidget.setWordWrap(True)
         self.resultadoListaWidget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.resultadoListaWidget.setStyleSheet("background-color: #DCDCDC; border-radius: 10px; padding: 5px;")
+        
+        self.resultadoListaWidget.setStyleSheet("background-color: #DCDCDC; color: black; border-radius: 10px; padding: 5px;")
         self.resultadoListaWidget.setFont(QFont("Courier New", 10))
+        self.resultadoListaWidget.setMinimumHeight(150)
         self.layout.addWidget(self.resultadoListaWidget)
 
         self.botonSubir = QPushButton("Subir archivo")
+        self.botonOriginales = QPushButton("Ver lenguajes originales") 
         self.botonUnion = QPushButton("Unión")
         self.botonConcatenacion = QPushButton("Concatenación")
         self.botonPotencia = QPushButton("Potencia")
         self.botonCerraduraP = QPushButton("Cerradura positiva")
         self.botonCerraduraK = QPushButton("Cerradura de Kleene")
         self.botonReflex = QPushButton("Reflexión")
-        self.botonGuardar = QPushButton("Guardar resultado")
+        self.botonGuardar = QPushButton("Guardar resultado actual")
 
-        botones = [self.botonSubir, self.botonUnion, self.botonConcatenacion, self.botonPotencia, self.botonCerraduraP, self.botonCerraduraK, self.botonReflex, self.botonGuardar]
+        botones = [self.botonSubir, self.botonOriginales, self.botonUnion, self.botonConcatenacion, 
+                   self.botonPotencia, self.botonCerraduraP, self.botonCerraduraK, self.botonReflex, self.botonGuardar]
         for b in botones:
             self.layout.addWidget(b)
         self.setLayout(self.layout)
 
-    
     def obtenerRutasArchivos(self):
         archivos, _ = QFileDialog.getOpenFileNames(self, "Selecciona 3 archivos", "", "Archivos de texto (*.txt)")
         if len(archivos) != 3:
             QMessageBox.warning(self, "Error", "Por favor, seleccione 3 archivos.")
             return None
         return archivos
-    
 
     def mostrarMensajeExito(self, mensaje):
         QMessageBox.information(self, "Éxito", mensaje)
 
     def mostrarMensajeError(self, mensaje):
         QMessageBox.critical(self, "Error", mensaje)
-
-    def seleccionarLeng(self, opBinaria = True):
-        items = ["1", "2", "3"]
-        l1, ok1 = QInputDialog.getItem(self, "Seleccionar lenguaje", "Primer lenguaje (L1):", items, 0, False)
-
-        if ok1 and opBinaria:
-            l2, ok2 = QInputDialog.getItem(self, "Seleccionar lenguaje", "Segundo lenguaje (L2):", items, 0, False)
-            if ok2:
-                return int(l1) - 1, int(l2) - 1
-        elif ok1:
-            return int(l1) - 1, None
-        
-        from PyQt6.QtWidgets import QInputDialog
 
     def seleccionarIndices(self, binaria=True):
         items = ["1", "2", "3"]
