@@ -24,18 +24,14 @@ class ControlLenguaje:
             try:
                 for ruta in rutas:
                     with open(ruta, 'r', encoding='utf-8') as f:
-                        # Leemos todo y quitamos caracteres de formato que se hayan colado
                         contenido = f.read()
-                        # Reemplazamos corchetes, comas y comillas por espacios
                         for char in "[]',\"":
                             contenido = contenido.replace(char, " ")
                         
-                        # Ahora dividimos por espacios
                         partes = contenido.split()
                         lenguaje_limpio = set()
                         
                         for p in partes:
-                            # Filtramos etiquetas y números de cardinalidad
                             if ":" not in p and not p.isdigit() and p.lower() != "res":
                                 lenguaje_limpio.add(p)
                                 
@@ -69,7 +65,7 @@ class ControlLenguaje:
                 res = OperacionesLenguajes.potencia(self.modelo[idx], n)
                 self.mostrarResultado(f"POTENCIA (n={n})", res, f"L{idx+1}^{n}")
 
-    def opCerraduraP(self): # Nombre corregido para coincidir con el __init__
+    def opCerraduraP(self): 
         if not self.verificarCarga(): return
         idx = self.vista.seleccionarIndices(binaria=False)
         if idx is not None:
@@ -110,36 +106,40 @@ class ControlLenguaje:
     def mostrarResultado(self, nombre, conjunto, operacion):
         self.vista.resultadoListaWidget.clear()
         self.vista.resultadoListaWidget.addItem(f"--- RESULTADO {nombre} ({operacion}) ---")
+        self.vista.resultadoListaWidget.addItem(f"Cardinalidad: {len(conjunto)}")
         self.vista.resultadoListaWidget.addItem("")
-        palabras = [w if w != "" else "λ" for w in sorted(list(conjunto))]
-        self.vista.resultadoListaWidget.addItem(f"Resultado: {palabras}")
-        self.vista.resultadoListaWidget.addItem("")
-        self.vista.resultadoListaWidget.addItem(f"\nCardinalidad: {len(conjunto)}")
+        palabras = [w if w != "" else "λ" for w in sorted(list(conjunto))] 
+        texto_para_mostrar = ", ".join(palabras) 
+        self.vista.resultadoListaWidget.addItem(texto_para_mostrar) 
 
     def opGuardar(self):
-        texto_widget = ""
-        for i in range(self.vista.resultadoListaWidget.count()):
-            t = self.vista.resultadoListaWidget.item(i).text()
-            if t.startswith("Res:"):
-                texto_widget = t
-                break
-
-        if not texto_widget:
+        if self.vista.resultadoListaWidget.count() < 3:
             self.vista.mostrarMensajeError("No hay resultado para guardar.")
             return
 
-        # LIMPIEZA PROFUNDA: Extraemos solo letras y números
-        import re
-        # Quitamos "Res:", corchetes, comillas y comas. 
-        # Buscamos solo el contenido de las comillas simples
-        palabras = re.findall(r"'(.*?)'", texto_widget)
+        lineas_resultado = []
+        for i in range(self.vista.resultadoListaWidget.count()):
+            texto = self.vista.resultadoListaWidget.item(i).text()
+            if "---" not in texto and "Cardinalidad" not in texto and texto.strip() != "":
+                lineas_resultado.append(texto)
+
+        if not lineas_resultado:
+            self.vista.mostrarMensajeError("El resultado está vacío.")
+            return
+        texto_sucio = " ".join(lineas_resultado)
+    
+        for char in "[],λ":
+            texto_sucio = texto_sucio.replace(char, "")
+    
+        palabras = [p.strip() for p in texto_sucio.replace(",", " ").split() if p.strip()]
 
         ruta = self.vista.obtenerRutaGuardar()
         if ruta:
             try:
-                with open(ruta, 'w', encoding='utf-8') as f:
-                    # Guardamos las palabras separadas por un solo espacio
-                    f.write(" ".join(palabras))
-                self.vista.mostrarMensajeExito("Archivo guardado limpio (texto plano).")
+                exito = OperacionesLenguajes.guardarArchivo(ruta, palabras)
+                if exito:
+                    self.vista.mostrarMensajeExito("Archivo guardado correctamente.")
+                else:
+                    raise Exception("Error al escribir el archivo.")
             except Exception as e:
                 self.vista.mostrarMensajeError(f"Error al guardar: {e}")

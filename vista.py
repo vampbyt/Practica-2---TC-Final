@@ -18,7 +18,9 @@ class VistaLenguaje(QWidget):
         self.layout.addWidget(self.label)
 
         self.resultadoListaWidget = QListWidget()
-        self.resultadoListaWidget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+
+        self.resultadoListaWidget.setWordWrap(True)
+        self.resultadoListaWidget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.resultadoListaWidget.setStyleSheet("background-color: #DCDCDC; border-radius: 10px; padding: 5px;")
         self.resultadoListaWidget.setFont(QFont("Courier New", 10))
         self.layout.addWidget(self.resultadoListaWidget)
@@ -65,20 +67,16 @@ class VistaLenguaje(QWidget):
         
         from PyQt6.QtWidgets import QInputDialog
 
-# Agrega este método dentro de la clase VistaLenguaje
     def seleccionarIndices(self, binaria=True):
         items = ["1", "2", "3"]
-    # Primer lenguaje (L_a)
         l1, ok1 = QInputDialog.getItem(self, "Seleccionar", "Lenguaje A:", items, 0, False)
     
         if ok1:
             if binaria:
-            # Segundo lenguaje (L_b) para operaciones como Unión o Concatenación
                 l2, ok2 = QInputDialog.getItem(self, "Seleccionar", "Lenguaje B:", items, 0, False)
                 if ok2:
                     return int(l1) - 1, int(l2) - 1
             else:
-            # Solo un lenguaje para Potencia, Reflexión o Cerraduras
                 return int(l1) - 1
         return None
 

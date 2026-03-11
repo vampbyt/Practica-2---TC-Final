@@ -1,6 +1,3 @@
-import sys
-from vista import VistaLenguaje
-
 
 class OperacionesLenguajes:
     @staticmethod
